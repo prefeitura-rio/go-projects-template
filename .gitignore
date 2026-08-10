@@ -42,7 +42,11 @@ Thumbs.db
 *.temp
 
 # devenv / Nix
+# .devenv/ and .direnv/ are generated caches — never commit them.
+# devenv.lock and devenv.yaml MUST be committed: they are the reproducibility
+# guarantee, equivalent to flake.lock in a pure Nix repo or package-lock.json
+# in Node. Committing the lock ensures every developer and CI run gets the
+# exact same tool versions.
 .devenv/
 .devenv.flake.nix
-devenv.lock
 .direnv/

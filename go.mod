@@ -1,3 +1,3 @@
 module github.com/prefeitura-rio/go_projects_template
 
-go 1.24
+go 1.26
