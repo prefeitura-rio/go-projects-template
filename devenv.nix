@@ -67,15 +67,30 @@
       settings.branch = [ "master" "main" ];
     };
 
-    # Format check — verifies code is formatted with gofumpt before committing.
-    # Does NOT auto-fix. If formatting is wrong, the commit is rejected and
-    # the developer must run `just fmt` first.
-    gofumpt-check = {
+    # Auto-format with gofumpt before committing.
+    # Uses -w (write) to reformat files in place.
+    # If any file is changed, pre-commit detects the modification, aborts the
+    # commit, and prompts the developer to review and re-stage the formatted
+    # files. On the second commit attempt the hook finds nothing to change
+    # and the commit succeeds.
+    # This is preferable to just reporting: the hook fixes the problem rather
+    # than asking the developer to run a separate command.
+    gofumpt-format = {
       enable = true;
       name = "gofumpt";
-      entry = "gofumpt -l -d .";
-      # -l: list files that differ from formatted output
-      # -d: show a diff of what would change
+      entry = "gofumpt -w .";
+      language = "system";
+      types = [ "go" ];
+      pass_filenames = false;
+    };
+
+    # Auto-organise imports with goimports before committing.
+    # Same auto-fix pattern as gofumpt: rewrites files in place, aborts the
+    # commit if any file was changed so the developer can review and re-stage.
+    goimports-format = {
+      enable = true;
+      name = "goimports";
+      entry = "goimports -w .";
       language = "system";
       types = [ "go" ];
       pass_filenames = false;
