@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/prefeitura-rio/go_api_gin_template/internal/health"
+	"github.com/prefeitura-rio/go_project_template/internal/health"
 )
 
 func main() {

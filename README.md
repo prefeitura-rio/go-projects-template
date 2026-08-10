@@ -1,6 +1,6 @@
-# Go API Template
+# Go Project Template
 
-A minimal, production-ready template for Go HTTP APIs.
+A minimal, production-ready template for Go projects.
 
 ## Stack
 
