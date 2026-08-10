@@ -108,7 +108,7 @@ These hooks run on every `git commit` before the commit is recorded:
 |---|---|
 | `just deps` | Download Go module dependencies |
 | `just fmt` | Format code (gofumpt + goimports) |
-| `just fmt-check` | Check formatting without modifying files (used in CI) |
+| `just fmt-check` | Check formatting (gofumpt + goimports) without modifying files (used in CI) |
 | `just lint` | Run linter |
 | `just test` | Run all tests with race detection |
 | `just test-coverage` | Run tests and produce an HTML coverage report |
@@ -129,7 +129,9 @@ CI ───┤            ├─── test
 
 - `fmt` and `lint` run in parallel
 - `test` runs only after both pass
-- All steps use the same commands as local development (`just`)
+- All jobs run inside the **same devenv environment** as local development
+  (`devenv shell just <recipe>`), so CI uses the exact tool versions pinned in
+  `devenv.lock` — there is no separate set of tool versions that can drift
 
 ## Updating Tool Versions
 
@@ -166,4 +168,4 @@ support the next Go release).
 2. Update the module path in all import statements
 3. Replace the `health` package with your own domain logic
 4. Add environment variables to `devenv.nix` under the `env` section
-5. Update tool versions in `Justfile` (`install-tools`) and `devenv.nix` (`packages`)
+5. Update tool versions by running `devenv update` (see "Updating Tool Versions" above) — never pin versions in `devenv.nix`
