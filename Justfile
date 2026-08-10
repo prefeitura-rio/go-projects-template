@@ -78,6 +78,6 @@ clean:
 
 # Install development tools (run once after cloning)
 install-tools:
-    go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-    go install mvdan.cc/gofumpt@latest
-    go install golang.org/x/tools/cmd/goimports@latest
+    go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8
+    go install mvdan.cc/gofumpt@v0.7.0
+    go install golang.org/x/tools/cmd/goimports@v0.33.0
