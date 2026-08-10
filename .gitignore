@@ -13,7 +13,7 @@ tmp/
 coverage.out
 coverage.html
 
-# Go module cache (never commit this)
+# Go module cache
 vendor/
 
 # IDE and editor files
@@ -32,7 +32,7 @@ Thumbs.db
 # Logs
 *.log
 
-# Environment and secrets (NEVER commit these)
+# Environment and secrets (never commit)
 .env
 .env.local
 .env.*.local
@@ -41,12 +41,8 @@ Thumbs.db
 *.tmp
 *.temp
 
-# devenv / Nix
-# .devenv/ and .direnv/ are generated caches — never commit them.
-# devenv.lock and devenv.yaml MUST be committed: they are the reproducibility
-# guarantee, equivalent to flake.lock in a pure Nix repo or package-lock.json
-# in Node. Committing the lock ensures every developer and CI run gets the
-# exact same tool versions.
+# devenv / Nix — generated caches; never commit.
+# devenv.lock and devenv.yaml MUST be committed (reproducibility).
 .devenv/
 .devenv.flake.nix
 .direnv/
