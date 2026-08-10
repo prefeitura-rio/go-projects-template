@@ -33,15 +33,14 @@ linters:
     - typecheck
 
     # ── Style & Formatting ────────────────────────────────────────────────────
-    # gofmt: ensures code is formatted with the standard Go formatter.
-    - gofmt
+    # gofumpt: a strict superset of gofmt — enforces all standard formatting rules
+    # plus additional style rules. Defined by INFRAVPIA-229 as the Go format tool.
+    # gofmt is intentionally omitted: gofumpt catches everything gofmt would catch.
+    - gofumpt
 
-    # goimports: like gofmt, but also enforces import organisation
+    # goimports: enforces import organisation
     # (stdlib first, then third-party, then internal).
     - goimports
-
-    # gofumpt: a stricter superset of gofmt with additional style rules.
-    - gofumpt
 
     # misspell: catches common English spelling mistakes in comments and strings.
     - misspell

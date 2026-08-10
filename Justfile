@@ -21,15 +21,16 @@ deps:
 # ── Code Quality ───────────────────────────────────────────────────────────────
 
 # Format source code
-# gofmt: standard Go formatter (built-in)
-# goimports: like gofmt but also organises import statements
+# gofumpt: strict superset of gofmt — covers all gofmt rules plus additional style rules
+# goimports: organises import statements (stdlib first, then third-party, then internal)
 fmt:
-    gofmt -w .
+    gofumpt -w .
     goimports -w .
 
 # Check formatting without modifying files (used in CI)
+# gofumpt -l lists files that differ from formatted output; we fail if any exist
 fmt-check:
-    @test -z "$(gofmt -l .)" || (echo "ERROR: The following files are not formatted:" && gofmt -l . && exit 1)
+    @test -z "$(gofumpt -l .)" || (echo "ERROR: The following files are not formatted:" && gofumpt -l . && exit 1)
 
 # Run the linter
 lint:
@@ -78,4 +79,5 @@ clean:
 # Install development tools (run once after cloning)
 install-tools:
     go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+    go install mvdan.cc/gofumpt@latest
     go install golang.org/x/tools/cmd/goimports@latest
