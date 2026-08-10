@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/prefeitura-rio/go_projects_template/internal/health"
+	"github.com/prefeitura-rio/go_projects_template/internal/http/handler"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/health", health.Handler())
+	mux.HandleFunc("/health", handler.Health())
 
 	addr := fmt.Sprintf(":%s", port)
 	log.Printf("server starting on %s", addr)
