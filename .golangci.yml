@@ -1,0 +1,132 @@
+run:
+  # Maximum time golangci-lint is allowed to run before it is killed.
+  timeout: 5m
+  # Also lint test files (files ending in _test.go).
+  tests: true
+  # Do not allow go mod download to update go.sum during lint.
+  modules-download-mode: readonly
+
+output:
+  # Sort lint results alphabetically for stable, readable output.
+  sort-results: true
+
+linters:
+  # Disable all linters by default, then enable only the ones we want.
+  # This makes the config explicit and stable across golangci-lint upgrades.
+  disable-all: true
+  enable:
+    # ── Correctness ───────────────────────────────────────────────────────────
+    # errcheck: report errors that are returned but not checked by the caller.
+    # In Go, ignoring errors is the most common source of bugs.
+    - errcheck
+
+    # govet: runs `go vet`, the official Go static analyser.
+    # Catches printf format mismatches, unreachable code, and more.
+    - govet
+
+    # staticcheck: a powerful analyser that catches deprecated API usage,
+    # always-true conditions, redundant code, and many other issues.
+    - staticcheck
+
+    # typecheck: ensures the code compiles. This catches import errors and
+    # type mismatches that would fail `go build`.
+    - typecheck
+
+    # ── Style & Formatting ────────────────────────────────────────────────────
+    # gofmt: ensures code is formatted with the standard Go formatter.
+    - gofmt
+
+    # goimports: like gofmt, but also enforces import organisation
+    # (stdlib first, then third-party, then internal).
+    - goimports
+
+    # gofumpt: a stricter superset of gofmt with additional style rules.
+    - gofumpt
+
+    # misspell: catches common English spelling mistakes in comments and strings.
+    - misspell
+
+    # whitespace: reports unnecessary blank lines at the start/end of blocks.
+    - whitespace
+
+    # ── Code Quality ──────────────────────────────────────────────────────────
+    # unused: reports exported and unexported identifiers that are never used.
+    - unused
+
+    # ineffassign: detects assignments whose value is never subsequently used.
+    - ineffassign
+
+    # gocritic: a large collection of style and correctness checks.
+    - gocritic
+
+    # gocyclo: reports functions with cyclomatic complexity above the threshold.
+    # High complexity → hard to test, hard to understand.
+    - gocyclo
+
+    # unconvert: reports unnecessary type conversions.
+    - unconvert
+
+    # unparam: reports function parameters that always receive the same value.
+    - unparam
+
+    # ── Security ──────────────────────────────────────────────────────────────
+    # gosec: detects security issues such as hardcoded credentials,
+    # weak random number generators, and unsafe file operations.
+    - gosec
+
+    # ── HTTP ──────────────────────────────────────────────────────────────────
+    # bodyclose: ensures HTTP response bodies are always closed after reading.
+    # Forgetting to close a response body leaks a network connection.
+    - bodyclose
+
+linters-settings:
+  errcheck:
+    # Also check errors in type assertions: x.(T) — not just function returns.
+    check-type-assertions: true
+    # Report errors assigned to the blank identifier: _ = f()
+    check-blank: true
+
+  gocritic:
+    # Enable all gocritic tag categories.
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+
+  gocyclo:
+    # Functions with cyclomatic complexity above 15 are reported.
+    # 15 is a reasonable threshold: below it, functions are usually testable.
+    min-complexity: 15
+
+  gosec:
+    excludes:
+      # G104: errors unhandled — already covered more precisely by errcheck.
+      - G104
+      # G304: file path provided as taint input — acceptable in templates/scripts.
+      - G304
+
+  staticcheck:
+    # Run all staticcheck analyses.
+    checks: ["all"]
+
+issues:
+  # Do not limit the number of reported issues.
+  max-same-issues: 0
+  max-issues-per-linter: 0
+
+  exclude-rules:
+    # Relax some rules in test files — tests intentionally use patterns
+    # (like ignoring errors or high complexity) that would be wrong in production code.
+    - path: _test\.go
+      linters:
+        - gosec
+        - errcheck
+        - gocyclo
+
+    # Relax gosec in entry points (cmd/) — main() often does things like
+    # reading files or env vars that gosec flags but are expected here.
+    - path: cmd/
+      linters:
+        - gosec
