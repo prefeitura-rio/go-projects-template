@@ -1,0 +1,157 @@
+name: CI
+
+# ── Triggers ────────────────────────────────────────────────────────────────────
+# push to main:          confirms main is healthy after a merge
+# pull_request to main:  gates the PR — prevents broken code from reaching main
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# ── Job orchestration ───────────────────────────────────────────────────────────
+#
+# fmt and lint run in parallel (independent checks, no dependency between them).
+# test runs only after BOTH fmt and lint succeed (declared via `needs:`).
+#
+# Execution graph:
+#
+#       ┌─── fmt ───┐
+# CI ───┤            ├─── test
+#       └─── lint ──┘
+#
+# If fmt or lint fails, test is skipped — no runner is wasted on tests that
+# would run against code that is not yet correctly formatted or linted.
+jobs:
+
+  # ── Job 1: Format check ───────────────────────────────────────────────────────
+  # Verifies all Go files are formatted with gofumpt.
+  # Fails with an actionable message if any file differs from expected output.
+  # Does not auto-fix — the developer must run `just fmt` locally.
+  fmt:
+    name: Format check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Reads Go version from go.mod — single source of truth for the toolchain.
+      # cache: true persists the Go module cache (~/.cache/go/pkg/mod) and the
+      # build cache (~/.cache/go/build) between runs, keyed on go.sum.
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      # Install just — the task runner used as the single source of truth for
+      # all quality gate commands. Version is pinned for idempotency.
+      - name: Set up just
+        uses: extractions/setup-just@v2
+        with:
+          just-version: '1.40.0'
+
+      # Cache the Go tool binaries installed by `just install-tools`.
+      # Key: hash of the Justfile — when tool versions in Justfile change,
+      # the cache is invalidated and tools are re-installed.
+      # If the cache hits, the install step below is skipped entirely.
+      - name: Cache Go tool binaries
+        id: cache-tools
+        uses: actions/cache@v4
+        with:
+          path: ~/go/bin
+          key: go-tools-${{ runner.os }}-${{ hashFiles('Justfile') }}
+
+      # Install tools only on cache miss.
+      # Uses `just install-tools` — the Justfile is the single source of truth
+      # for which tools are installed and at which pinned versions.
+      - name: Install tools
+        if: steps.cache-tools.outputs.cache-hit != 'true'
+        run: just install-tools
+
+      # Run the format check via just — same command a developer runs locally.
+      # Fails if any file differs from gofumpt's expected output.
+      - name: Check formatting
+        run: just fmt-check
+
+  # ── Job 2: Lint ───────────────────────────────────────────────────────────────
+  # Runs golangci-lint using the project's .golangci.yml configuration.
+  # Uses `just lint` — same command a developer runs locally.
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Set up just
+        uses: extractions/setup-just@v2
+        with:
+          just-version: '1.40.0'
+
+      - name: Cache Go tool binaries
+        id: cache-tools
+        uses: actions/cache@v4
+        with:
+          path: ~/go/bin
+          key: go-tools-${{ runner.os }}-${{ hashFiles('Justfile') }}
+
+      - name: Install tools
+        if: steps.cache-tools.outputs.cache-hit != 'true'
+        run: just install-tools
+
+      # Cache golangci-lint's own analysis results.
+      # golangci-lint stores per-file analysis results between runs. On a run
+      # where only 2 files changed, it re-analyses only those 2 files.
+      # Cache key includes .golangci.yml (config) and go.sum (dependencies)
+      # because changes to either require full re-analysis.
+      # restore-keys allows a partial match — a stale cache is still useful
+      # because golangci-lint only needs to re-analyse what changed.
+      - name: Cache golangci-lint analysis results
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/golangci-lint
+          key: golangci-lint-${{ runner.os }}-${{ hashFiles('.golangci.yml', 'go.sum') }}
+          restore-keys: |
+            golangci-lint-${{ runner.os }}-
+
+      - name: Run linter
+        run: just lint
+
+  # ── Job 3: Test ───────────────────────────────────────────────────────────────
+  # Runs only after both fmt and lint succeed.
+  # `needs: [fmt, lint]` declares this dependency — GitHub Actions will not
+  # start this job until both listed jobs have completed successfully.
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: [fmt, lint]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      # just is needed to call `just test`, but the test job does not call
+      # `just install-tools` — Go itself is the only tool needed to run tests.
+      - name: Set up just
+        uses: extractions/setup-just@v2
+        with:
+          just-version: '1.40.0'
+
+      # Single source of truth: same flags (-count=1 -race -v) as Justfile.
+      - name: Run tests
+        run: just test
