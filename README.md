@@ -16,13 +16,28 @@ A minimal, production-ready template for Go projects.
 ```
 .
 ├── cmd/
-│   └── api/          # Application entry point
+│   └── api/                   # Application entry point
+├── configs/                   # Configuration files
+├── deployments/
+│   └── compose/               # Docker Compose for local development
 ├── internal/
-│   └── health/       # Health check handler and tests
-├── configs/          # Configuration files
-├── scripts/          # Helper scripts
+│   ├── app/                   # Application bootstrap and lifecycle
+│   ├── config/                # Configuration structs and loading
+│   ├── domain/                # Business entities
+│   ├── http/
+│   │   ├── handler/           # HTTP handlers (health check and others)
+│   │   └── middleware/        # HTTP middleware
+│   ├── observability/         # Logs, metrics, tracing
+│   ├── repository/            # Persistence interfaces and implementations
+│   ├── service/               # Business logic
+│   └── version/               # Version information
+├── k8s/
+│   └── staging/               # Kubernetes manifests
+├── migrations/                # Database migration files
+├── pkg/                       # Reusable packages
+├── scripts/                   # Helper scripts
 └── .github/
-    └── workflows/    # CI/CD pipelines
+    └── workflows/             # CI/CD pipelines
 ```
 
 ## Getting Started

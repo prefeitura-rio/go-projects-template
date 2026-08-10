@@ -1,23 +1,23 @@
-// Package health provides an HTTP handler for health check endpoints.
-package health
+// Package handler provides HTTP handlers for the application.
+package handler
 
 import (
 	"encoding/json"
 	"net/http"
 )
 
-// Response is the JSON body returned by the health check endpoint.
-type Response struct {
+// HealthResponse is the JSON body returned by the health check endpoint.
+type HealthResponse struct {
 	Status string `json:"status"`
 }
 
-// Handler returns an HTTP handler that responds with a JSON health status.
-func Handler() http.HandlerFunc {
+// Health returns an HTTP handler that responds with a JSON health status.
+func Health() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
-		resp := Response{Status: "ok"}
+		resp := HealthResponse{Status: "ok"}
 		if err := json.NewEncoder(w).Encode(resp); err != nil {
 			http.Error(w, "failed to encode response", http.StatusInternalServerError)
 		}

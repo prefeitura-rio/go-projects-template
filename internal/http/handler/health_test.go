@@ -1,4 +1,4 @@
-package health_test
+package handler_test
 
 import (
 	"encoding/json"
@@ -6,20 +6,20 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/prefeitura-rio/go_projects_template/internal/health"
+	"github.com/prefeitura-rio/go_projects_template/internal/http/handler"
 )
 
-func TestHandler_ReturnsOK(t *testing.T) {
+func TestHealth_ReturnsOK(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/health", http.NoBody)
 	rec := httptest.NewRecorder()
 
-	health.Handler()(rec, req)
+	handler.Health()(rec, req)
 
 	if rec.Code != http.StatusOK {
 		t.Errorf("expected status 200, got %d", rec.Code)
 	}
 
-	var resp health.Response
+	var resp handler.HealthResponse
 	if err := json.NewDecoder(rec.Body).Decode(&resp); err != nil {
 		t.Fatalf("failed to decode response body: %v", err)
 	}
