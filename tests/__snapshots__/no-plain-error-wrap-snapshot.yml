@@ -1,0 +1,16 @@
+id: no-plain-error-wrap
+snapshots:
+  ? |
+    fmt.Errorf("failed: %s", err.Error())
+  : labels:
+    - source: 'fmt.Errorf("failed: %s", err.Error())'
+      style: primary
+      start: 0
+      end: 37
+  ? |
+    fmt.Errorf("failed: %v", err)
+  : labels:
+    - source: 'fmt.Errorf("failed: %v", err)'
+      style: primary
+      start: 0
+      end: 29

@@ -1,0 +1,15 @@
+id: no-http-default-client
+language: Go
+valid:
+  - |
+    client := &http.Client{Timeout: 10 * time.Second}
+    resp, err := client.Get(url)
+  - |
+    resp, err := http.DefaultTransport.RoundTrip(req)
+invalid:
+  - |
+    resp, err := http.Get("https://example.com")
+  - |
+    resp, err := http.Post("https://example.com", "application/json", body)
+  - |
+    _ = http.DefaultClient

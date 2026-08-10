@@ -1,0 +1,12 @@
+id: no-plain-error-wrap
+language: Go
+valid:
+  - |
+    fmt.Errorf("failed: %w", err)
+  - |
+    fmt.Errorf("count: %d", n)
+invalid:
+  - |
+    fmt.Errorf("failed: %v", err)
+  - |
+    fmt.Errorf("failed: %s", err.Error())

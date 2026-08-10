@@ -1,0 +1,12 @@
+id: no-http-default-client
+language: Go
+severity: warning
+message: Avoid using http.DefaultClient or the package-level http.Get/Post helpers. They have no timeouts and can hang forever. Create a client with explicit timeouts instead.
+rule:
+  any:
+    - kind: selector_expression
+      regex: "^http\\.DefaultClient$"
+    - kind: call_expression
+      has:
+        field: function
+        regex: "^http\\.(Get|Post|Head|PostForm)$"

@@ -1,0 +1,19 @@
+id: no-panic
+language: Go
+valid:
+  - |
+    func handle() error {
+      return errors.New("boom")
+    }
+invalid:
+  - |
+    func handle() {
+      panic("boom")
+    }
+  - |
+    func handle() error {
+      if err != nil {
+        panic(err)
+      }
+      return nil
+    }
