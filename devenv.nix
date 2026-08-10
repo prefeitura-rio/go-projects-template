@@ -41,12 +41,22 @@
   # ── Language runtime ─────────────────────────────────────────────────────────
   # devenv manages the Go toolchain. This ensures all developers and CI use
   # the same Go version without manual installation.
-  languages.go = {
-    enable = true;
-    # Pin the Go version. Update this when the project upgrades Go.
-    # Available packages: pkgs.go (latest), pkgs.go_1_23, pkgs.go_1_24, etc.
-    package = pkgs.go_1_24;
-  };
+  #
+  # We do NOT pin a specific Go version here. The exact Go version (and the
+  # version of every other tool) is determined by the nixpkgs snapshot pinned
+  # in devenv.lock. All packages in that snapshot are internally consistent —
+  # Go, gopls, golangci-lint, and the rest are guaranteed to work together.
+  #
+  # To advance versions deliberately (e.g. to pick up a new Go release):
+  #   devenv update          # rolls devenv.lock to a new consistent snapshot
+  #   go mod tidy            # align go.mod with the new Go version if needed
+  #   git add devenv.lock    # commit the lock file like any other dependency bump
+  #
+  # Only pin a specific version (e.g. package = pkgs.go_1_25) when the project
+  # has a hard external requirement on that exact version. Doing so adds a
+  # second constraint on top of devenv.lock that can cause conflicts with the
+  # tools that nixpkgs built for that snapshot.
+  languages.go.enable = true;
 
   # ── Git hooks ────────────────────────────────────────────────────────────────
   # These hooks run automatically before each `git commit`.

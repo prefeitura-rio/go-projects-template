@@ -4,7 +4,7 @@ A minimal, production-ready template for Go projects.
 
 ## Stack
 
-- **Language**: Go 1.24
+- **Language**: Go 1.26
 - **HTTP**: standard library `net/http`
 - **Linting**: golangci-lint
 - **Formatting**: gofumpt + goimports
@@ -25,33 +25,68 @@ A minimal, production-ready template for Go projects.
     └── workflows/    # CI/CD pipelines
 ```
 
-## Prerequisites
-
-- [devenv](https://devenv.sh) — installs Go, all tools, and git hooks automatically
-- [direnv](https://direnv.net) — activates the devenv environment when entering the directory (recommended)
-
-All other tools (Go, just, golangci-lint, gofumpt, goimports) are managed by devenv.
-You do not need to install them manually.
-
 ## Getting Started
 
-### With direnv (recommended)
+All tools — Go, golangci-lint, gofumpt, goimports, just — are declared in
+`devenv.nix`. You do not install them manually. The bootstrap script installs
+the only real prerequisite (Nix + devenv + direnv) in a single step.
+
+### Step 1 — Bootstrap (one time, per machine)
 
 ```bash
 git clone git@github.com:prefeitura-rio/go_projects_template.git
 cd go_projects_template
-direnv allow    # one-time: grants direnv permission to auto-activate this environment
+bash scripts/bootstrap.sh
 ```
 
+The script installs:
+
+| Tool | Purpose |
+|---|---|
+| Nix | Package manager that devenv is built on |
+| devenv | Reads `devenv.nix`; provides Go and all dev tools |
+| direnv | Shell extension that auto-activates devenv when you enter the directory |
+
+After the script finishes, open a **new terminal** so the shell changes take effect.
+
+### Step 2 — Set up local environment variables (one time, per repo)
+
+```bash
+cp .env.example .env
+```
+
+`.env` is gitignored and is your local configuration file. Edit it to add
+any project-specific values. devenv loads it automatically when the shell
+activates, so you never need to `export` variables manually.
+
+### Step 3 — Allow direnv (one time, per repo)
+
+```bash
+cd go_projects_template
+direnv allow
+```
+
+This grants direnv permission to load `.envrc`. It only needs to be done once.
+The environment will then activate automatically on every subsequent entry.
+
+### Step 4 — Work normally
+
 From this point on, entering the project directory in any terminal automatically
-activates the environment, installs tools, and registers git hooks.
+activates the full environment — Go, tools, and git hooks — with no extra commands.
+
+```bash
+cd go_projects_template   # environment activates
+just test                 # run tests
+just lint                 # run linter
+```
 
 ### Without direnv
 
+If you prefer not to use direnv, activate the environment manually each session:
+
 ```bash
-git clone git@github.com:prefeitura-rio/go_projects_template.git
 cd go_projects_template
-devenv shell    # activate the environment manually in each terminal session
+devenv shell
 ```
 
 ## Git Hooks
@@ -95,6 +130,35 @@ CI ───┤            ├─── test
 - `fmt` and `lint` run in parallel
 - `test` runs only after both pass
 - All steps use the same commands as local development (`just`)
+
+## Updating Tool Versions
+
+All tool versions (Go, gopls, golangci-lint, gofumpt, etc.) are determined by
+the nixpkgs snapshot pinned in `devenv.lock`. Every package in that snapshot is
+internally consistent — Go and gopls, for example, are guaranteed to work
+together because nixpkgs tested that exact combination.
+
+To advance all tools to a newer snapshot:
+
+```bash
+devenv update          # rolls devenv.lock forward to a fresh consistent snapshot
+go mod tidy            # align go.mod if the Go minor version changed
+```
+
+Then commit `devenv.lock` (and `go.mod` if it changed) like any other
+dependency bump. Every developer who pulls that commit gets the exact same
+new versions automatically on their next `direnv allow` reload.
+
+**Why not pin individual package versions in `devenv.nix`?**
+
+Writing `package = pkgs.go_1_25` adds a second constraint on top of
+`devenv.lock`. If the pinned nixpkgs snapshot ships gopls built for Go 1.26,
+forcing Go 1.25 breaks the build — as we experienced. The lock file is already
+your reproducibility guarantee; individual pins fight it.
+
+Only pin a specific package version when the project has a hard external
+requirement on that exact version (e.g. a third-party SDK that doesn't yet
+support the next Go release).
 
 ## Customizing This Template
 
