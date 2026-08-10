@@ -1,0 +1,48 @@
+# Compiled binaries and build output
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+tmp/
+
+# Test output
+*.test
+*.out
+coverage.out
+coverage.html
+
+# Go module cache (never commit this)
+vendor/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS metadata
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment and secrets (NEVER commit these)
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+*.tmp
+*.temp
+
+# devenv / Nix
+.devenv/
+.devenv.flake.nix
+devenv.lock
+.direnv/
