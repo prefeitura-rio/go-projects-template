@@ -1,0 +1,8 @@
+id: no-panic
+language: Go
+severity: error
+message: Avoid panic() in production code. Return an error instead.
+rule:
+  pattern: panic($$$ARGS)
+ignores:
+  - "**/*_test.go"

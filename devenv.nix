@@ -16,6 +16,7 @@
     golangci-lint
     gofumpt
     gotools # includes goimports
+    ast-grep # structural search and lint (sg)
   ];
 
   # Version is pinned via devenv.lock, not here. Only pin a specific version

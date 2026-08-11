@@ -23,6 +23,15 @@ fmt-check:
 lint:
     golangci-lint run ./...
 
+# ── ast-grep (structural lint) ──
+# Scan the codebase with custom ast-grep rules in rules/
+sg-lint:
+    ast-grep scan
+
+# Test that the ast-grep rules behave as expected (tests/)
+sg-test *ARGS="":
+    ast-grep test -t tests {{ ARGS }}
+
 # ── Testing ──
 # -race requires CGO_ENABLED=1 (file-level default is 0 for static builds)
 test *ARGS="":
@@ -42,7 +51,7 @@ run:
     go run ./cmd/api
 
 # ── Workflow ──
-precommit: fmt lint test
+precommit: fmt lint sg-lint sg-test test
 
 clean:
     rm -rf bin/

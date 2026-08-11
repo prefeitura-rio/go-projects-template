@@ -6,7 +6,7 @@ A minimal, production-ready template for Go projects.
 
 - **Language**: Go 1.26
 - **HTTP**: standard library `net/http`
-- **Linting**: golangci-lint
+- **Linting**: golangci-lint + ast-grep (structural lint)
 - **Formatting**: gofumpt + goimports
 - **Dev environment**: devenv (Nix-based, reproducible)
 - **Task runner**: Just
@@ -35,14 +35,19 @@ A minimal, production-ready template for Go projects.
 │   └── staging/               # Kubernetes manifests
 ├── migrations/                # Database migration files
 ├── pkg/                       # Reusable packages
+├── rules/                     # ast-grep structural lint rules
 ├── scripts/                   # Helper scripts
+├── sgconfig.yaml              # ast-grep project configuration
+├── tests/
+│   ├── __snapshots__/         # ast-grep rule test snapshots
+│   └── *.yml                  # ast-grep rule tests
 └── .github/
     └── workflows/             # CI/CD pipelines
 ```
 
 ## Getting Started
 
-All tools — Go, golangci-lint, gofumpt, goimports, just — are declared in
+All tools — Go, golangci-lint, ast-grep, gofumpt, goimports, just — are declared in
 `devenv.nix`. You do not install them manually. The bootstrap script installs
 the only real prerequisite (Nix + devenv + direnv) in a single step.
 
@@ -124,12 +129,14 @@ These hooks run on every `git commit` before the commit is recorded:
 | `just deps` | Download Go module dependencies |
 | `just fmt` | Format code (gofumpt + goimports) |
 | `just fmt-check` | Check formatting (gofumpt + goimports) without modifying files (used in CI) |
-| `just lint` | Run linter |
+| `just lint` | Run golangci-lint |
+| `just sg-lint` | Scan the codebase with ast-grep custom rules (`rules/`) |
+| `just sg-test` | Test that the ast-grep rules behave as expected (`tests/`) |
 | `just test` | Run all tests with race detection |
 | `just test-coverage` | Run tests and produce an HTML coverage report |
 | `just build` | Build the binary |
 | `just run` | Run the application locally |
-| `just precommit` | Run fmt + lint + test (mirrors CI quality gate) |
+| `just precommit` | Run fmt + lint + sg-lint + sg-test + test (mirrors CI quality gate) |
 | `just clean` | Remove build artifacts |
 
 ## CI/CD
@@ -137,16 +144,45 @@ These hooks run on every `git commit` before the commit is recorded:
 GitHub Actions runs automatically on every push and pull request to `main`.
 
 ```
-      ┌─── fmt ───┐
-CI ───┤            ├─── test
-      └─── lint ──┘
+             ┌─── fmt ───┐
+CI ──────────┤           ├─── test
+             ├─── lint ──┤
+             └─── sg  ───┘
 ```
 
-- `fmt` and `lint` run in parallel
-- `test` runs only after both pass
+- `fmt`, `lint` and `sg` (ast-grep) run in parallel
+- `test` runs only after all three pass
 - All jobs run inside the **same devenv environment** as local development
   (`devenv shell just <recipe>`), so CI uses the exact tool versions pinned in
   `devenv.lock` — there is no separate set of tool versions that can drift
+
+### ast-grep (structural lint)
+
+[ast-grep](https://ast-grep.github.io/) complements golangci-lint with
+**project-specific structural rules**. golangci-lint is generic and type-aware;
+it cannot know this project's own conventions. ast-grep parses code into an
+AST and matches code *patterns* instead of text, which lets us encode policies
+like "never call `panic()`" or "never use `http.DefaultClient`".
+
+The rules live in `rules/` and are discovered via `sgconfig.yaml`. Each rule
+has a matching test in `tests/` (valid/invalid snippets compared against
+snapshots in `tests/__snapshots__/`).
+
+| Rule | Severity | What it does |
+|---|---|---|
+| `no-panic` | error | Rejects `panic()` in production code |
+| `no-http-default-client` | warning | Rejects `http.DefaultClient` and the `http.Get/Post/Head/PostForm` helpers (no timeouts) |
+| `no-plain-error-wrap` | warning | Rejects `fmt.Errorf` with `%v`/`%s` when `%w` preserves the original error |
+
+**Adding a new rule:**
+
+1. Write `rules/<name>.yaml` (see existing rules for the format)
+2. Add `tests/<name>.yml` with `valid`/`invalid` snippets
+3. Run `just sg-test -U` once to generate the snapshot baseline
+4. Run `just sg-lint` to scan the codebase; fix any newly flagged code
+
+The rule is then enforced locally (`just precommit`) and in CI automatically —
+no CI file changes needed, since the `sg` job runs every rule in `rules/`.
 
 ## Updating Tool Versions
 
@@ -183,4 +219,5 @@ support the next Go release).
 2. Update the module path in all import statements
 3. Replace the `health` package with your own domain logic
 4. Add environment variables to `devenv.nix` under the `env` section
-5. Update tool versions by running `devenv update` (see "Updating Tool Versions" above) — never pin versions in `devenv.nix`
+5. Add or adjust ast-grep rules in `rules/` (see "ast-grep" under CI/CD) — the example rules are seeds, not a fixed set
+6. Update tool versions by running `devenv update` (see "Updating Tool Versions" above) — never pin versions in `devenv.nix`

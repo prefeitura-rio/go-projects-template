@@ -1,0 +1,30 @@
+id: no-plain-error-wrap
+snapshots:
+  ? |
+    fmt.Errorf("failed: %s", err.Error())
+  : labels:
+    - source: 'fmt.Errorf("failed: %s", err.Error())'
+      style: primary
+      start: 0
+      end: 37
+  ? |
+    fmt.Errorf("failed: %v", err)
+  : labels:
+    - source: 'fmt.Errorf("failed: %v", err)'
+      style: primary
+      start: 0
+      end: 29
+  ? |
+    fmt.Errorf("failed: %v", err, other)
+  : labels:
+    - source: 'fmt.Errorf("failed: %v", err, other)'
+      style: primary
+      start: 0
+      end: 36
+  ? |
+    fmt.Errorf("user %s failed: %v", user, err)
+  : labels:
+    - source: 'fmt.Errorf("user %s failed: %v", user, err)'
+      style: primary
+      start: 0
+      end: 43
