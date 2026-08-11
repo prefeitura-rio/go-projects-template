@@ -8,6 +8,7 @@ on:
 
 # fmt, lint and ast-grep run in parallel; test runs only after all succeed (needs:).
 # All jobs run inside the same devenv shell as local development.
+# devenv setup is shared via the setup-devenv composite action (prefeitura-rio/actions).
 jobs:
   fmt:
     name: Format check
@@ -17,16 +18,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
-
-      - name: Use devenv binary cache
-        uses: cachix/cachix-action@v17
-        with:
-          name: devenv
-
-      - name: Install devenv
-        run: nix profile add nixpkgs#devenv
+      - name: Setup devenv
+        uses: prefeitura-rio/actions/setup-devenv@master
 
       - name: Check formatting
         run: devenv shell just fmt-check
@@ -39,16 +32,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
-
-      - name: Use devenv binary cache
-        uses: cachix/cachix-action@v17
-        with:
-          name: devenv
-
-      - name: Install devenv
-        run: nix profile add nixpkgs#devenv
+      - name: Setup devenv
+        uses: prefeitura-rio/actions/setup-devenv@master
 
       - name: Run linter
         run: devenv shell just lint
@@ -61,16 +46,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
-
-      - name: Use devenv binary cache
-        uses: cachix/cachix-action@v17
-        with:
-          name: devenv
-
-      - name: Install devenv
-        run: nix profile add nixpkgs#devenv
+      - name: Setup devenv
+        uses: prefeitura-rio/actions/setup-devenv@master
 
       - name: Scan code with ast-grep rules
         run: devenv shell just sg-lint
@@ -87,16 +64,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
-
-      - name: Use devenv binary cache
-        uses: cachix/cachix-action@v17
-        with:
-          name: devenv
-
-      - name: Install devenv
-        run: nix profile add nixpkgs#devenv
+      - name: Setup devenv
+        uses: prefeitura-rio/actions/setup-devenv@master
 
       - name: Run tests
         run: devenv shell just test
