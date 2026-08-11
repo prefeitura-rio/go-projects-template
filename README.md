@@ -144,8 +144,8 @@ These hooks run on every `git commit` before the commit is recorded:
 GitHub Actions runs automatically on every push and pull request to `main`.
 
 ```
-            ┌─── fmt ───┐
-CI ──────────┤            ├─── test
+             ┌─── fmt ───┐
+CI ──────────┤           ├─── test
              ├─── lint ──┤
              └─── sg  ───┘
 ```
