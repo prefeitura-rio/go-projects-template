@@ -3,9 +3,9 @@ language: Go
 severity: warning
 message: Wrap errors with %w instead of %v so the original error is preserved for errors.Is/errors.As.
 rule:
-  pattern: fmt.Errorf($FORMAT, $ERR)
+  pattern: fmt.Errorf($FORMAT, $$$ARGS)
 constraints:
   FORMAT:
-    regex: "%[v|s]"
+    regex: "%[vs]"
     not:
       regex: "%w"
