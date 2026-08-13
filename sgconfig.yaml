@@ -1,4 +1,0 @@
-# ast-grep project configuration.
-# Tells ast-grep where to discover custom lint rules.
-ruleDirs:
-  - rules
