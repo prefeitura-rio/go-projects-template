@@ -40,7 +40,8 @@ A minimal, production-ready template for Go projects.
 ## Getting Started
 
 The Go toolchain is declared in `devenv.nix`. You do not install it manually.
-The bootstrap script installs the only real prerequisites (Nix + devenv) in a single step.
+The bootstrap script installs the prerequisites and sets up automatic environment
+activation in a single step.
 
 ### Step 1 — Bootstrap (one time, per machine)
 
@@ -50,24 +51,37 @@ cd go_projects_template
 bash scripts/bootstrap.sh
 ```
 
-The script installs:
+The script:
 
-| Tool | Purpose |
+| What | Details |
 |---|---|
-| Nix | Package manager that devenv is built on |
-| devenv | Reads `devenv.nix`; provides the Go toolchain |
+| Installs Nix | Package manager that devenv is built on |
+| Installs devenv | Reads `devenv.nix`; provides the Go toolchain |
+| Adds devenv shell hook | One line in your shell RC file (`~/.bashrc`, `~/.zshrc`, etc.) that enables auto-activation on `cd` |
 
-After the script finishes, open a **new terminal** so the Nix changes take effect.
+After the script finishes, open a **new terminal** so the shell hook takes effect.
 
-### Step 2 — Enter the environment
+### Step 2 — Trust the project (one time, per clone)
 
 ```bash
 cd go_projects_template
-devenv shell
+devenv allow
 ```
 
-This drops you into a shell with Go and git hooks available.
-Run this once per terminal session.
+This tells devenv it may activate automatically when you enter this directory.
+
+### Step 3 — Work normally
+
+From this point on, entering the project directory in any terminal automatically
+activates the full environment — Go, git hooks — with no extra commands.
+
+```bash
+cd go_projects_template   # environment activates
+go build ./...
+go test ./...
+```
+
+Leaving the directory deactivates it automatically.
 
 ## Git Hooks
 
