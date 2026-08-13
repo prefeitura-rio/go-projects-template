@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# scripts/bootstrap.sh — One-time setup: installs Nix, devenv, and direnv.
+# scripts/bootstrap.sh — One-time setup: installs Nix and devenv.
 # Usage: bash scripts/bootstrap.sh
-# After: run `direnv allow` once per repo.
+# After: open a new terminal and run `devenv shell` to enter the environment.
 
 set -eu -o pipefail
 
@@ -57,65 +57,6 @@ else
   ok "devenv installed: $(devenv version)"
 fi
 
-step "Checking for direnv..."
-
-if command -v direnv &>/dev/null; then
-  ok "direnv is already installed: $(direnv version)"
-else
-  step "Installing direnv via nix profile..."
-  nix profile install nixpkgs#direnv
-  ok "direnv installed: $(direnv version)"
-fi
-
-step "Shell hook setup..."
-
-SHELL_NAME="$(basename "${SHELL:-bash}")"
-
-HOOK_ALREADY_SET=false
-case "$SHELL_NAME" in
-  bash)
-    if grep -q 'direnv hook bash' "$HOME/.bashrc" 2>/dev/null; then
-      HOOK_ALREADY_SET=true
-    fi
-    HOOK_SNIPPET='eval "$(direnv hook bash)"'
-    HOOK_FILE="$HOME/.bashrc"
-    ;;
-  zsh)
-    if grep -q 'direnv hook zsh' "$HOME/.zshrc" 2>/dev/null; then
-      HOOK_ALREADY_SET=true
-    fi
-    HOOK_SNIPPET='eval "$(direnv hook zsh)"'
-    HOOK_FILE="$HOME/.zshrc"
-    ;;
-  fish)
-    if grep -q 'direnv hook fish' "$HOME/.config/fish/config.fish" 2>/dev/null; then
-      HOOK_ALREADY_SET=true
-    fi
-    HOOK_SNIPPET='direnv hook fish | source'
-    HOOK_FILE="$HOME/.config/fish/config.fish"
-    ;;
-  *)
-    HOOK_SNIPPET="# see https://direnv.net/docs/hook.html for your shell"
-    HOOK_FILE="your shell's startup file"
-    ;;
-esac
-
-if [ "$HOOK_ALREADY_SET" = true ]; then
-  ok "direnv hook already present in $HOOK_FILE"
-else
-  echo ""
-  echo "  ACTION REQUIRED: Add the direnv hook to your shell."
-  echo ""
-  echo "  Run this command:"
-  echo ""
-  echo "    echo '$HOOK_SNIPPET' >> $HOOK_FILE"
-  echo ""
-  echo "  Then restart your terminal (or run: source $HOOK_FILE)"
-  echo ""
-  echo "  This is a one-time setup. direnv will then automatically"
-  echo "  activate environments in any repo that has an .envrc."
-fi
-
 echo ""
 echo "============================================================"
 echo " Bootstrap complete!"
@@ -123,10 +64,10 @@ echo "============================================================"
 echo ""
 echo " Next steps:"
 echo ""
-echo "   1. Open a new terminal (so the Nix and direnv changes take effect)"
+echo "   1. Open a new terminal (so the Nix changes take effect)"
 echo "   2. Navigate to this repository"
-echo "   3. Run: direnv allow"
+echo "   3. Run: devenv shell"
 echo ""
-echo " After step 3, the development environment activates automatically"
-echo " every time you enter this directory."
+echo " The development environment (Go, tools, git hooks) activates"
+echo " inside the devenv shell."
 echo ""

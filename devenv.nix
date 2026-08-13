@@ -1,15 +1,13 @@
 # devenv.nix — Development environment for go_projects_template
 #
 # Tool versions come from the nixpkgs snapshot pinned in devenv.lock.
-# The command layer lives in the Justfile (no `tasks` declared here) so local
-# dev and CI share one entry point. See https://devenv.sh.
+# The command layer lives in the Justfile so local dev and CI share one
+# entry point. See https://devenv.sh.
 
 { pkgs, ... }:
 
 {
   name = "go_projects_template";
-
-  dotenv.enable = true;
 
   packages = with pkgs; [
     just

@@ -3,8 +3,6 @@ set shell := ["/usr/bin/env", "bash", "-eu", "-o", "pipefail", "-c"]
 export GO111MODULE := "on"
 export CGO_ENABLED := "0"
 
-set dotenv-load
-
 # ── Dependencies ──
 deps:
     go mod tidy
