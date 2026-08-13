@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# scripts/bootstrap.sh — One-time setup: installs Nix and devenv.
+# scripts/bootstrap.sh — One-time setup: installs Nix, devenv, and the devenv
+# shell hook for automatic environment activation.
 # Usage: bash scripts/bootstrap.sh
-# After: open a new terminal and run `devenv shell` to enter the environment.
+# After: open a new terminal, navigate to the repo, and run `devenv allow`.
 
 set -eu -o pipefail
 
@@ -57,6 +58,44 @@ else
   ok "devenv installed: $(devenv version)"
 fi
 
+step "Setting up devenv shell hook for auto-activation..."
+
+# Fish and Nushell load the devenv hook automatically when devenv is installed
+# via Nix; no manual setup needed. Bash and Zsh require one line in the RC file.
+SHELL_NAME="$(basename "${SHELL:-bash}")"
+
+case "$SHELL_NAME" in
+  bash)
+    HOOK_SNIPPET='eval "$(devenv hook bash)"'
+    HOOK_FILE="$HOME/.bashrc"
+    ;;
+  zsh)
+    HOOK_SNIPPET='eval "$(devenv hook zsh)"'
+    HOOK_FILE="$HOME/.zshrc"
+    ;;
+  fish | nu)
+    ok "devenv hook is loaded automatically for $SHELL_NAME — nothing to do."
+    HOOK_SNIPPET=""
+    HOOK_FILE=""
+    ;;
+  *)
+    HOOK_SNIPPET=""
+    HOOK_FILE=""
+    ;;
+esac
+
+if [ -n "$HOOK_FILE" ]; then
+  if grep -q 'devenv hook' "$HOOK_FILE" 2>/dev/null; then
+    ok "devenv hook already present in $HOOK_FILE"
+  else
+    echo "$HOOK_SNIPPET" >> "$HOOK_FILE"
+    ok "Added devenv hook to $HOOK_FILE"
+  fi
+elif [ -z "$HOOK_SNIPPET" ] && [ "$SHELL_NAME" != "fish" ] && [ "$SHELL_NAME" != "nu" ]; then
+  note "Unknown shell '$SHELL_NAME'."
+  note "Add the devenv hook manually: https://devenv.sh/auto-activation/"
+fi
+
 echo ""
 echo "============================================================"
 echo " Bootstrap complete!"
@@ -64,10 +103,10 @@ echo "============================================================"
 echo ""
 echo " Next steps:"
 echo ""
-echo "   1. Open a new terminal (so the Nix changes take effect)"
+echo "   1. Open a new terminal (so the shell hook takes effect)"
 echo "   2. Navigate to this repository"
-echo "   3. Run: devenv shell"
+echo "   3. Run: devenv allow"
 echo ""
-echo " The development environment (Go, tools, git hooks) activates"
-echo " inside the devenv shell."
+echo " After step 3, the environment activates automatically"
+echo " every time you cd into this directory."
 echo ""
