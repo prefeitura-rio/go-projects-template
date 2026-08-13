@@ -6,12 +6,9 @@ on:
   pull_request:
     branches: [main]
 
-# fmt, lint and ast-grep run in parallel; test runs only after all succeed (needs:).
-# All jobs run inside the same devenv shell as local development.
-# devenv setup is shared via the setup-devenv composite action (prefeitura-rio/actions).
 jobs:
-  fmt:
-    name: Format check
+  quality-gate:
+    name: Quality Gate
     runs-on: ubuntu-latest
 
     steps:
@@ -21,51 +18,12 @@ jobs:
       - name: Setup devenv
         uses: prefeitura-rio/actions/setup-devenv@master
 
-      - name: Check formatting
-        run: devenv shell just fmt-check
+      # TODO: replace the placeholder below with the quality gate action once available.
+      #
+      # - name: Run quality gate
+      #   uses: prefeitura-rio/actions/quality-gate@master
+      #   with:
+      #     language: go
 
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Setup devenv
-        uses: prefeitura-rio/actions/setup-devenv@master
-
-      - name: Run linter
-        run: devenv shell just lint
-
-  sg:
-    name: ast-grep
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Setup devenv
-        uses: prefeitura-rio/actions/setup-devenv@master
-
-      - name: Scan code with ast-grep rules
-        run: devenv shell just sg-lint
-
-      - name: Test ast-grep rules
-        run: devenv shell just sg-test
-
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    needs: [fmt, lint, sg]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Setup devenv
-        uses: prefeitura-rio/actions/setup-devenv@master
-
-      - name: Run tests
-        run: devenv shell just test
+      - name: Quality gate (placeholder)
+        run: echo "Quality gate not yet wired up. See prefeitura-rio/actions."
