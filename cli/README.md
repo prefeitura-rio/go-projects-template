@@ -12,7 +12,7 @@ contents of this directory into a new repository root and start building.
 | Dev environment | devenv (Nix-based, reproducible) |
 | Git hooks | `ripsecrets` + `no-commit-to-branch` |
 | Tests | `go test` (race detector enabled) |
-| CI | GitHub Actions → `prefeitura-rio/actions/quality-gate@latest` |
+| CI | GitHub Actions → `prefeitura-rio/actions/quality-gate@master` |
 
 ## Project structure
 
@@ -29,7 +29,7 @@ devenv.nix
 devenv.yaml
 devenv.lock
 scripts/bootstrap.sh
-.github/workflows/ci.yaml
+.github/workflows/quality-gate.yaml
 ```
 
 ## Why command logic lives in `internal/cli`
