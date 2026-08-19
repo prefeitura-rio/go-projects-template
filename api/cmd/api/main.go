@@ -2,12 +2,13 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
-	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
-	"github.com/prefeitura-rio/go-projects-template/internal/http/handler"
+	"github.com/prefeitura-rio/go-projects-template/internal/app"
 )
 
 func main() {
@@ -16,13 +17,10 @@ func main() {
 		port = "8080"
 	}
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/health", handler.Health())
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
-	addr := fmt.Sprintf(":%s", port)
-	log.Printf("server starting on %s", addr)
-
-	if err := http.ListenAndServe(addr, mux); err != nil {
+	if err := app.New(port).Run(ctx); err != nil {
 		log.Fatalf("server error: %v", err)
 	}
 }

@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - uses: prefeitura-rio/actions/quality-gate@latest
+      - uses: prefeitura-rio/actions/quality-gate@master
         with:
           check: app:format
 
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - uses: prefeitura-rio/actions/quality-gate@latest
+      - uses: prefeitura-rio/actions/quality-gate@master
         with:
           check: app:lint
 
@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - uses: prefeitura-rio/actions/quality-gate@latest
+      - uses: prefeitura-rio/actions/quality-gate@master
         with:
           check: app:strlint
 
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - uses: prefeitura-rio/actions/quality-gate@latest
+      - uses: prefeitura-rio/actions/quality-gate@master
         with:
           check: app:typecheck
 
@@ -51,6 +51,6 @@ jobs:
     needs: [format, lint, strlint, typecheck]
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - uses: prefeitura-rio/actions/quality-gate@latest
+      - uses: prefeitura-rio/actions/quality-gate@master
         with:
           check: app:test
