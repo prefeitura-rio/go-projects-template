@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/prefeitura-rio/go_projects_template/internal/http/handler"
+	"github.com/prefeitura-rio/go-projects-template/internal/http/handler"
 )
 
 func main() {

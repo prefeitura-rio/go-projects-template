@@ -46,8 +46,8 @@ activation in a single step.
 ### Step 1 — Bootstrap (one time, per machine)
 
 ```bash
-git clone git@github.com:prefeitura-rio/go_projects_template.git
-cd go_projects_template
+git clone git@github.com:prefeitura-rio/go-projects-template.git
+cd go-projects-template
 bash scripts/bootstrap.sh
 ```
 
@@ -64,7 +64,7 @@ After the script finishes, open a **new terminal** so the shell hook takes effec
 ### Step 2 — Trust the project (one time, per clone)
 
 ```bash
-cd go_projects_template
+cd go-projects-template
 devenv allow
 ```
 
@@ -76,7 +76,7 @@ From this point on, entering the project directory in any terminal automatically
 activates the full environment — Go, git hooks — with no extra commands.
 
 ```bash
-cd go_projects_template   # environment activates
+cd go-projects-template   # environment activates
 go build ./...
 go test ./...
 ```

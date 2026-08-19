@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/prefeitura-rio/go_projects_template/internal/http/handler"
+	"github.com/prefeitura-rio/go-projects-template/internal/http/handler"
 )
 
 func TestHealth_ReturnsOK(t *testing.T) {

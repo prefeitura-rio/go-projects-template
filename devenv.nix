@@ -1,4 +1,4 @@
-# devenv.nix — Development environment for go_projects_template
+# devenv.nix — Development environment for go-projects-template
 #
 # Provides the Go toolchain for local development. Tool versions are pinned
 # by the nixpkgs snapshot in devenv.lock — never pin individual packages here.
@@ -9,7 +9,7 @@
 { pkgs, ... }:
 
 {
-  name = "go_projects_template";
+  name = "go-projects-template";
 
   # Version is pinned via devenv.lock, not here. Only pin a specific version
   # when the project has a hard external requirement on it.
