@@ -11,7 +11,7 @@ import (
 func TestHandlerHealth(t *testing.T) {
 	a := app.New("8080")
 
-	req := httptest.NewRequest(http.MethodGet, "/health", nil)
+	req := httptest.NewRequest(http.MethodGet, "/health", http.NoBody)
 	w := httptest.NewRecorder()
 
 	a.Handler().ServeHTTP(w, req)

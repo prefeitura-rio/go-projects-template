@@ -29,6 +29,11 @@ func New(port string) *App {
 		server: &http.Server{
 			Addr:    fmt.Sprintf(":%s", port),
 			Handler: mux,
+			// Timeouts protect against slow-loris style attacks and hung
+			// connections; ReadHeaderTimeout is mandatory (gosec G112).
+			ReadHeaderTimeout: 10 * time.Second,
+			ReadTimeout:       30 * time.Second,
+			WriteTimeout:      30 * time.Second,
 		},
 	}
 }

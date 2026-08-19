@@ -18,9 +18,10 @@ func main() {
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
 
-	if err := app.New(port).Run(ctx); err != nil {
+	err := app.New(port).Run(ctx)
+	stop() // release the signal watcher regardless of how Run returned
+	if err != nil {
 		log.Fatalf("server error: %v", err)
 	}
 }
