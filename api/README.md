@@ -92,9 +92,29 @@ These hooks run on every `git commit` before the commit is recorded:
 ## CI/CD
 
 GitHub Actions runs automatically on every push and pull request to `main`.
+Two workflows ship with this template:
 
-Quality checks (formatting, linting, tests) are enforced by the quality gate action
-(`prefeitura-rio/actions/quality-gate`), which is currently being developed.
+| Workflow | Purpose |
+|---|---|
+| `quality-gate.yaml` | Formatting, linting, structural lint, type check, tests — via `prefeitura-rio/actions/quality-gate` |
+| `sast.yaml` | Security scanning (opengrep, grype/SBOM, checkov, SonarQube) via the org reusable workflow `prefeitura-rio/actions/.github/workflows/sast.yml` |
+
+### SAST required secrets
+
+`sast.yaml` needs the following secrets and variables at the repository or
+organization level:
+
+| Name | Type | Purpose |
+|---|---|---|
+| `SONAR_HOST_URL` | Variable | SonarQube server URL |
+| `SONAR_TOKEN` | Secret | SonarQube access token |
+| `DD_TOKEN` | Secret | DefectDojo API token |
+| `TS_TAGS` | Secret | Tailscale tags for the runner |
+| `TS_OAUTH_CLIENT_ID` | Secret | Tailscale OAuth client ID |
+| `TS_OAUTH_SECRET` | Secret | Tailscale OAuth client secret |
+
+Until these exist, the `sast` job will fail — configure them before enabling
+the workflow.
 
 ## Customizing This Template
 
