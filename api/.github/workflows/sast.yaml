@@ -1,0 +1,20 @@
+name: SAST
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  sast:
+    name: Security Scan
+    uses: prefeitura-rio/actions/.github/workflows/sast.yml@master
+    with:
+      sonar_url: ${{ vars.SONAR_HOST_URL }}
+    secrets:
+      sonar_token: ${{ secrets.SONAR_TOKEN }}
+      dd_token: ${{ secrets.DD_TOKEN }}
+      ts_tags: ${{ secrets.TS_TAGS }}
+      ts_oauth_client_id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+      ts_oauth_secret: ${{ secrets.TS_OAUTH_SECRET }}
