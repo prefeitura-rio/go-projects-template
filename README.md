@@ -1,107 +1,75 @@
-# Go Project Template
+# Go Project Templates
 
-A minimal, production-ready template for Go projects.
+A collection of minimal, production-ready Go project starters. Each template
+is an independent, self-contained repository — copy the contents of the
+relevant subdirectory into a new repository root and start building.
 
-## Stack
+## Available templates
 
-- **Language**: Go 1.26
-- **HTTP**: standard library `net/http`
-- **Dev environment**: devenv (Nix-based, reproducible)
+| Template | Description | Highlights |
+|---|---|---|
+| [`api/`](./api/) | HTTP REST API | stdlib `net/http`, Go 1.26 |
+| [`library/`](./library/) | Importable Go package | GitHub module path distribution |
+| [`cli/`](./cli/) | Command-line tool | stdlib `flag`, testable `Run(args, out)` |
 
-## Project Structure
+## What every template shares
 
-```
-.
-├── cmd/
-│   └── api/                   # Application entry point
-├── configs/                   # Configuration files
-├── deployments/
-│   └── compose/               # Docker Compose for local development
-├── internal/
-│   ├── app/                   # Application bootstrap and lifecycle
-│   ├── config/                # Configuration structs and loading
-│   ├── domain/                # Business entities
-│   ├── http/
-│   │   ├── handler/           # HTTP handlers
-│   │   └── middleware/        # HTTP middleware
-│   ├── observability/         # Logs, metrics, tracing
-│   ├── repository/            # Persistence interfaces and implementations
-│   ├── service/               # Business logic
-│   └── version/               # Version information
-├── k8s/
-│   └── staging/               # Kubernetes manifests
-├── migrations/                # Database migration files
-├── pkg/                       # Reusable packages
-├── scripts/                   # Helper scripts
-└── .github/
-    └── workflows/             # CI/CD pipelines
-```
+All three templates use the same conventions so patterns learned in one apply
+to the others:
 
-## Getting Started
-
-The Go toolchain is declared in `devenv.nix`. You do not install it manually.
-The bootstrap script installs the prerequisites and sets up automatic environment
-activation in a single step.
-
-### Step 1 — Bootstrap (one time, per machine)
-
-```bash
-git clone git@github.com:prefeitura-rio/go_projects_template.git
-cd go_projects_template
-bash scripts/bootstrap.sh
-```
-
-The script:
-
-| What | Details |
+| Concern | Choice |
 |---|---|
-| Installs Nix | Package manager that devenv is built on |
-| Installs devenv | Reads `devenv.nix`; provides the Go toolchain |
-| Adds devenv shell hook | One line in your shell RC file (`~/.bashrc`, `~/.zshrc`, etc.) that enables auto-activation on `cd` |
+| Language | Go 1.26 |
+| HTTP | standard library `net/http` (API template) |
+| Dev environment | devenv (Nix-based, reproducible) |
+| Git hooks | `ripsecrets` + `no-commit-to-branch` |
+| Formatting | gofumpt + goimports |
+| Linting | golangci-lint (org-wide config) |
+| Structural linting | ast-grep (org-wide rules via `quality-gate`) |
+| Tests | `go test` with race detector |
+| CI | GitHub Actions → `prefeitura-rio/actions/quality-gate@master` |
 
-After the script finishes, open a **new terminal** so the shell hook takes effect.
+## CI pipeline structure
 
-### Step 2 — Trust the project (one time, per clone)
+Every template ships an identical `.github/workflows/quality-gate.yaml` with five jobs:
 
-```bash
-cd go_projects_template
-devenv allow
+```
+format ──┐
+lint   ──┤
+strlint──┼──> test
+typecheck┘
 ```
 
-This tells devenv it may activate automatically when you enter this directory.
+The four checks run in parallel. `test` runs only after all four pass. This
+keeps feedback fast: a formatting error does not block linting, and tests only
+run on code that has already passed static analysis.
 
-### Step 3 — Work normally
+## How to use a template
 
-From this point on, entering the project directory in any terminal automatically
-activates the full environment — Go, git hooks — with no extra commands.
+1. Copy the template subdirectory into a new, empty repository:
+   ```bash
+   cp -r go-projects-template/api/. my-new-api/
+   cd my-new-api
+   ```
+2. Update the module name in `go.mod` and `name` in `devenv.nix`.
+3. Follow the template-specific README for the remaining rename steps.
+4. Bootstrap the dev environment:
+   ```bash
+   bash scripts/bootstrap.sh
+   # Open a new terminal, then:
+   devenv allow
+   ```
+5. Verify everything works:
+   ```bash
+   go build ./...
+   go test ./...
+   ```
 
-```bash
-cd go_projects_template   # environment activates
-go build ./...
-go test ./...
-```
+## Template-specific docs
 
-Leaving the directory deactivates it automatically.
+Each template contains its own `README.md` with detailed usage instructions,
+stack choices, and testing guidance:
 
-## Git Hooks
-
-devenv automatically installs pre-commit hooks when the environment is activated.
-These hooks run on every `git commit` before the commit is recorded:
-
-| Hook | Behaviour |
-|---|---|
-| `ripsecrets` | Scans for accidentally committed secrets; aborts commit if found |
-| `no-commit-to-branch` | Blocks direct commits to `main`; use a branch and open a PR |
-
-## CI/CD
-
-GitHub Actions runs automatically on every push and pull request to `main`.
-
-Quality checks (formatting, linting, tests) are enforced by the quality gate action
-(`prefeitura-rio/actions/quality-gate`), which is currently being developed.
-
-## Customizing This Template
-
-1. Update the module name in `go.mod`
-2. Update the module path in all import statements
-3. Replace the `health` package with your own domain logic
+- [api/README.md](./api/README.md)
+- [library/README.md](./library/README.md)
+- [cli/README.md](./cli/README.md)
