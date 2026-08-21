@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
-# scripts/bootstrap.sh — One-time setup: installs Nix, devenv, and the devenv
-# shell hook for automatic environment activation.
-# Usage: bash scripts/bootstrap.sh
-# After: open a new terminal, navigate to the repo, and run `devenv allow`.
 
 set -eu -o pipefail
 
@@ -29,9 +25,6 @@ else
   note "Source: https://devenv.sh/getting-started/"
   curl -L https://devenv.sh/install.sh | bash
 
-  # Source nix-daemon's env now so `nix` works in this script; the installer
-  # only updates login shells.
-  # shellcheck disable=SC1091
   if [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
     . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
   elif [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
@@ -47,7 +40,6 @@ if command -v devenv &>/dev/null; then
   ok "devenv is already installed: $(devenv version)"
 else
   step "Installing devenv via nix profile..."
-  # Enable the experimental features nix profile requires.
   mkdir -p "$HOME/.config/nix"
   if ! grep -q "experimental-features" "$HOME/.config/nix/nix.conf" 2>/dev/null; then
     echo "experimental-features = nix-command flakes" >> "$HOME/.config/nix/nix.conf"
@@ -60,8 +52,6 @@ fi
 
 step "Setting up devenv shell hook for auto-activation..."
 
-# Fish and Nushell load the devenv hook automatically when devenv is installed
-# via Nix; no manual setup needed. Bash and Zsh require one line in the RC file.
 SHELL_NAME="$(basename "${SHELL:-bash}")"
 
 case "$SHELL_NAME" in

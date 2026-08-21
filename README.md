@@ -44,6 +44,11 @@ The four checks run in parallel. `test` runs only after all four pass. This
 keeps feedback fast: a formatting error does not block linting, and tests only
 run on code that has already passed static analysis.
 
+The `api/` template additionally ships `.github/workflows/sast.yaml` — security
+scanning (opengrep, grype/SBOM, checkov, SonarQube) via the org reusable
+workflow `prefeitura-rio/actions/.github/workflows/sast.yml`. See
+[api/README.md](./api/README.md) for the required secrets and variables.
+
 ## How to use a template
 
 1. Copy the template subdirectory into a new, empty repository:

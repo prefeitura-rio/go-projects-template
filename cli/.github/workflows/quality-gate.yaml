@@ -6,8 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-# fmt-check, lint, strlint and typecheck run in parallel.
-# test runs only after all four pass (needs:).
 jobs:
   format:
     name: Format

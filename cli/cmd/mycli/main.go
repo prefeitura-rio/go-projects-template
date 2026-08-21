@@ -1,6 +1,3 @@
-// Command mycli is the entry point for the CLI. It keeps process-level
-// concerns (os.Args, os.Stdout, exit codes) here and delegates all logic to
-// internal/cli.
 package main
 
 import (

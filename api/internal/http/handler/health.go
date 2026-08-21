@@ -1,4 +1,4 @@
-// Package handler provides HTTP handlers for the application.
+// Package handler provides HTTP handlers.
 package handler
 
 import (
@@ -6,12 +6,12 @@ import (
 	"net/http"
 )
 
-// HealthResponse is the JSON body returned by the health check endpoint.
+// HealthResponse is the JSON health check response.
 type HealthResponse struct {
 	Status string `json:"status"`
 }
 
-// Health returns an HTTP handler that responds with a JSON health status.
+// Health returns the health check handler.
 func Health() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

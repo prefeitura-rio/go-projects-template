@@ -1,4 +1,3 @@
-// Command api starts the HTTP API server.
 package main
 
 import (
@@ -20,7 +19,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 
 	err := app.New(port).Run(ctx)
-	stop() // release the signal watcher regardless of how Run returned
+	stop()
 	if err != nil {
 		log.Fatalf("server error: %v", err)
 	}
