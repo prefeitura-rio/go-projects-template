@@ -59,28 +59,25 @@ intended-public symbols may be exported:
 
 ## How to use
 
-1. Copy this directory into a new, empty repository:
-   ```bash
-   cp -r go-projects-template/library/. my-library/
-   cd my-library
-   ```
-2. Rename the package:
-   - Rename `mylibrary.go` to `<package_name>.go`.
-   - Change the `package` clause to your package name.
-   - Update `module` in `go.mod` to the target GitHub path.
-   - Update the import in `mylibrary_test.go`.
-   - Update `name` in `devenv.nix`.
-3. Bootstrap the dev environment:
-   ```bash
-   bash scripts/bootstrap.sh
-   # Open a new terminal, then:
-   devenv allow
-   ```
-4. Verify everything works:
-   ```bash
-   go build ./...
-   go test ./...
-   ```
+Copy this directory into a new, empty repository and run the bootstrap script:
+
+```bash
+cp -r go-projects-template/library/. my-library/
+cd my-library
+bash scripts/bootstrap.sh
+```
+
+The script prompts for the package name and Go module path. It renames the
+package files, updates package clauses, doc comments, imports, and `devenv.nix`,
+installs the development environment, and trusts the project automatically.
+Open a **new terminal** after the script finishes.
+
+Verify everything works:
+
+```bash
+go build ./...
+go test ./...
+```
 
 ## CI pipeline
 

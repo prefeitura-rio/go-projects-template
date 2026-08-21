@@ -62,29 +62,25 @@ adding `cobra` when your requirements demand it — not before.
 
 ## How to use
 
-1. Copy this directory into a new, empty repository:
-   ```bash
-   cp -r go-projects-template/cli/. my-cli/
-   cd my-cli
-   ```
-2. Rename the command:
-   - Rename `cmd/mycli/` to `cmd/<your_command>/`.
-   - Update the module path in `go.mod`.
-   - Update imports in `cmd/<your_command>/main.go` and
-     `internal/cli/cli_test.go`.
-   - Update the `FlagSet` name in `internal/cli/cli.go`.
-   - Update `name` in `devenv.nix`.
-3. Bootstrap the dev environment:
-   ```bash
-   bash scripts/bootstrap.sh
-   # Open a new terminal, then:
-   devenv allow
-   ```
-4. Verify everything works:
-   ```bash
-   go build ./...
-   go test ./...
-   ```
+Copy this directory into a new, empty repository and run the bootstrap script:
+
+```bash
+cp -r go-projects-template/cli/. my-cli/
+cd my-cli
+bash scripts/bootstrap.sh
+```
+
+The script prompts for the command name and Go module path. It renames
+`cmd/mycli/`, updates Go imports, updates the `FlagSet` name and doc comment,
+installs the development environment, and trusts the project automatically.
+Open a **new terminal** after the script finishes.
+
+Verify everything works:
+
+```bash
+go build ./...
+go test ./...
+```
 
 ## CI pipeline
 

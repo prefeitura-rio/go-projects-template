@@ -15,6 +15,79 @@ note() {
   echo "  [note] $*"
 }
 
+die() {
+  echo "Error: $*" >&2
+  exit 1
+}
+
+require_interactive() {
+  if [[ ! -t 0 || ! -t 1 ]]; then
+    die "project initialization requires an interactive terminal"
+  fi
+}
+
+confirm_initialization() {
+  local answer
+  read -r -p "  Apply these changes? [Y/n] " answer
+  if [[ -n "$answer" && ! "$answer" =~ ^[Yy]$ ]]; then
+    die "project initialization cancelled"
+  fi
+}
+
+initialize_project() {
+  local template_module="github.com/prefeitura-rio/go-cli-template"
+  local command_name
+  local module_path
+
+  if ! grep -q "$template_module" go.mod; then
+    return
+  fi
+
+  require_interactive
+
+  [[ -f go.mod && -f devenv.nix && -d cmd/mycli ]] || die "template CLI files are missing"
+
+  read -r -p "Command name: " command_name
+  [[ "$command_name" =~ ^[a-z][a-z0-9_]*$ ]] || die "command name must be a valid lowercase Go identifier"
+  case "$command_name" in
+    break|default|func|interface|select|case|defer|go|map|struct|chan|else|goto|package|switch|const|fallthrough|if|range|type|continue|for|import|return|var)
+      die "command name cannot be a Go keyword"
+      ;;
+  esac
+  [[ "$command_name" != "mycli" ]] || die "command name cannot be the template placeholder"
+  [[ ! -e "cmd/$command_name" ]] || die "target command directory already exists"
+
+  read -r -p "Go module path: " module_path
+  [[ "$module_path" =~ ^[A-Za-z0-9][A-Za-z0-9.-]*(/[A-Za-z0-9._~-]+)+$ ]] || die "Go module path is invalid"
+  [[ "$module_path" != "$template_module" ]] || die "Go module path cannot be the template placeholder"
+
+  echo ""
+  echo "Initializing project from template..."
+  echo ""
+  echo "  Command name  : $command_name"
+  echo "  Go module path: $module_path"
+  echo ""
+  echo "  Changes to apply:"
+  echo "    rename  cmd/mycli/           -> cmd/$command_name/"
+  echo "    update  go.mod               (module path)"
+  echo "    update  internal/cli/cli.go  (FlagSet + doc comment)"
+  echo "    update  **/*.go              (import paths)"
+  echo "    update  devenv.nix           (name field)"
+
+  confirm_initialization
+
+  mv cmd/mycli "cmd/$command_name"
+  sed -i "s|^module $template_module$|module $module_path|" go.mod
+  while IFS= read -r -d '' file; do
+    sed -i "s|$template_module|$module_path|g" "$file"
+  done < <(find . -type f -name '*.go' -print0)
+  sed -i "s|mycli|$command_name|g" internal/cli/cli.go
+  sed -i "s|go-cli-template|$command_name|g" devenv.nix
+  ok "Project initialized"
+}
+
+initialize_project
+
 step "Checking for Nix..."
 
 if command -v nix &>/dev/null; then
@@ -86,17 +159,15 @@ elif [ -z "$HOOK_SNIPPET" ] && [ "$SHELL_NAME" != "fish" ] && [ "$SHELL_NAME" !=
   note "Add the devenv hook manually: https://devenv.sh/auto-activation/"
 fi
 
+step "Trusting devenv project..."
+devenv allow
+ok "devenv project trusted"
+
 echo ""
 echo "============================================================"
 echo " Bootstrap complete!"
 echo "============================================================"
 echo ""
-echo " Next steps:"
-echo ""
-echo "   1. Open a new terminal (so the shell hook takes effect)"
-echo "   2. Navigate to this repository"
-echo "   3. Run: devenv allow"
-echo ""
-echo " After step 3, the environment activates automatically"
-echo " every time you cd into this directory."
+echo " Open a new terminal. The environment activates automatically"
+echo " when you navigate to this directory."
 echo ""
