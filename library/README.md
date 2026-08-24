@@ -10,7 +10,7 @@ contents of this directory into a new repository root and start building.
 | Language | Go 1.26 |
 | Distribution | Imported directly from the GitHub module path |
 | Dev environment | devenv (Nix-based, reproducible) |
-| Git hooks | `ripsecrets` + `no-commit-to-branch` |
+| Git hooks | `ripsecrets` + `no-commit-to-branch` + format/lint/strlint (pre-commit) + typecheck/test (pre-push) |
 | Tests | `go test` (race detector enabled) |
 | CI | GitHub Actions → `prefeitura-rio/actions/quality-gate@master` |
 
@@ -75,8 +75,22 @@ Open a **new terminal** after the script finishes.
 Verify everything works:
 
 ```bash
-go build ./...
-go test ./...
+devenv run app:typecheck
+devenv run app:test
+```
+
+## Running quality checks locally
+
+devenv tasks wrap the same tools CI uses. Run them with `devenv run`:
+
+```bash
+devenv run app:format           # gofumpt + goimports (auto-fix)
+devenv run app:format:check     # gofumpt + goimports (check)
+devenv run app:lint             # golangci-lint --fix
+devenv run app:lint:check       # golangci-lint
+devenv run app:strlint          # ast-grep scan
+devenv run app:typecheck        # go vet + go build
+devenv run app:test             # go test -race
 ```
 
 ## CI pipeline

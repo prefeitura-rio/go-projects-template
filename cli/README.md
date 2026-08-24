@@ -10,7 +10,7 @@ contents of this directory into a new repository root and start building.
 | Language | Go 1.26 |
 | Argument parsing | standard library `flag` (no framework) |
 | Dev environment | devenv (Nix-based, reproducible) |
-| Git hooks | `ripsecrets` + `no-commit-to-branch` |
+| Git hooks | `ripsecrets` + `no-commit-to-branch` + format/lint/strlint (pre-commit) + typecheck/test (pre-push) |
 | Tests | `go test` (race detector enabled) |
 | CI | GitHub Actions → `prefeitura-rio/actions/quality-gate@master` |
 
@@ -78,9 +78,37 @@ Open a **new terminal** after the script finishes.
 Verify everything works:
 
 ```bash
-go build ./...
-go test ./...
+devenv run app:typecheck
+devenv run app:test
 ```
+
+## Running quality checks locally
+
+devenv tasks wrap the same tools CI uses. Run them with `devenv run`:
+
+```bash
+devenv run app:format           # gofumpt + goimports (auto-fix)
+devenv run app:format:check     # gofumpt + goimports (check)
+devenv run app:lint             # golangci-lint --fix
+devenv run app:lint:check       # golangci-lint
+devenv run app:strlint          # ast-grep scan
+devenv run app:typecheck        # go vet + go build
+devenv run app:test             # go test -race
+```
+
+## Git Hooks
+
+devenv automatically installs hooks when the environment is activated:
+
+| Hook | Stage | Behaviour |
+|---|---|---|
+| `ripsecrets` | pre-commit | Scans for accidentally committed secrets |
+| `no-commit-to-branch` | pre-commit | Blocks direct commits to `master` and `main` |
+| `app-format` | pre-commit | Checks formatting (gofumpt + goimports); auto-fixes and re-stages, blocks commit |
+| `app-lint` | pre-commit | Checks linting (golangci-lint); auto-fixes and re-stages, blocks commit |
+| `app-strlint` | pre-commit | Structural lint (ast-grep); check-only, blocks commit |
+| `app-typecheck` | pre-push | Runs `go vet` + `go build` |
+| `app-test` | pre-push | Runs `go test -race` |
 
 ## CI pipeline
 
