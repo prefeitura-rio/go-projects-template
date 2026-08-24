@@ -3,7 +3,7 @@ package mylibrary_test
 import (
 	"testing"
 
-	"github.com/prefeitura-rio/go-library-template"
+	mylibrary "github.com/prefeitura-rio/go-library-template"
 )
 
 func TestAdd(t *testing.T) {

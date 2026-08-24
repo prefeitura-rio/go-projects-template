@@ -1,0 +1,38 @@
+name: Quality Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    name: ${{ matrix.template }} / ${{ matrix.check }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        template: [api, cli, library]
+        check: [app:format, app:lint, app:strlint, app:typecheck]
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: prefeitura-rio/actions/quality-gate@master
+        with:
+          check: ${{ matrix.check }}
+          working-directory: ${{ matrix.template }}
+
+  test:
+    name: ${{ matrix.template }} / app:test
+    needs: check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        template: [api, cli, library]
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: prefeitura-rio/actions/quality-gate@master
+        with:
+          check: app:test
+          working-directory: ${{ matrix.template }}

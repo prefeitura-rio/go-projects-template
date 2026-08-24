@@ -61,11 +61,11 @@
 
     app-format = {
       enable = true;
-      entry = pkgs.writeShellScript "app-format" ''
+      entry = "${pkgs.writeShellScript "app-format" ''
         echo "[pre-commit] app:format:check — checking formatting..."
-        if ! devenv run app:format:check > /dev/null 2>&1; then
+        if ! devenv tasks run app:format:check > /dev/null 2>&1; then
           echo "[pre-commit] app:format — formatting issues found, auto-fixing..."
-          devenv run app:format
+          devenv tasks run app:format
           git add -u
           echo "[pre-commit] app:format — files auto-formatted and re-staged."
           echo "[pre-commit] Review changes with: git diff --cached"
@@ -73,7 +73,7 @@
           exit 1
         fi
         echo "[pre-commit] app:format:check — passed."
-      '';
+      ''}";
       language = "system";
       pass_filenames = false;
       stages = [ "pre-commit" ];
@@ -81,11 +81,11 @@
 
     app-lint = {
       enable = true;
-      entry = pkgs.writeShellScript "app-lint" ''
+      entry = "${pkgs.writeShellScript "app-lint" ''
         echo "[pre-commit] app:lint:check — running lint checks..."
-        if ! devenv run app:lint:check > /dev/null 2>&1; then
+        if ! devenv tasks run app:lint:check > /dev/null 2>&1; then
           echo "[pre-commit] app:lint — lint issues found, attempting auto-fix..."
-          devenv run app:lint
+          devenv tasks run app:lint
           git add -u
           echo "[pre-commit] app:lint — auto-fix applied and re-staged."
           echo "[pre-commit] Review changes with: git diff --cached"
@@ -93,7 +93,7 @@
           exit 1
         fi
         echo "[pre-commit] app:lint:check — passed."
-      '';
+      ''}";
       language = "system";
       pass_filenames = false;
       stages = [ "pre-commit" ];
@@ -101,14 +101,14 @@
 
     app-strlint = {
       enable = true;
-      entry = pkgs.writeShellScript "app-strlint" ''
+      entry = "${pkgs.writeShellScript "app-strlint" ''
         echo "[pre-commit] app:strlint:check — running structural lint..."
-        if ! devenv run app:strlint:check > /dev/null 2>&1; then
+        if ! devenv tasks run app:strlint:check > /dev/null 2>&1; then
           echo "[pre-commit] app:strlint:check — failed. Fix violations above."
           exit 1
         fi
         echo "[pre-commit] app:strlint:check — passed."
-      '';
+      ''}";
       language = "system";
       pass_filenames = false;
       stages = [ "pre-commit" ];
@@ -116,14 +116,14 @@
 
     app-typecheck = {
       enable = true;
-      entry = pkgs.writeShellScript "app-typecheck" ''
+      entry = "${pkgs.writeShellScript "app-typecheck" ''
         echo "[pre-push] app:typecheck — running type checks..."
-        if ! devenv run app:typecheck; then
+        if ! devenv tasks run app:typecheck; then
           echo "[pre-push] app:typecheck — failed."
           exit 1
         fi
         echo "[pre-push] app:typecheck — passed."
-      '';
+      ''}";
       language = "system";
       pass_filenames = false;
       stages = [ "pre-push" ];
@@ -131,14 +131,14 @@
 
     app-test = {
       enable = true;
-      entry = pkgs.writeShellScript "app-test" ''
+      entry = "${pkgs.writeShellScript "app-test" ''
         echo "[pre-push] app:test — running tests..."
-        if ! devenv run app:test; then
+        if ! devenv tasks run app:test; then
           echo "[pre-push] app:test — failed."
           exit 1
         fi
         echo "[pre-push] app:test — passed."
-      '';
+      ''}";
       language = "system";
       pass_filenames = false;
       stages = [ "pre-push" ];
