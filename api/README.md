@@ -57,26 +57,39 @@ The Go toolchain is declared in `devenv.nix`; no manual Go installation is neede
 Verify the initialized project with:
 
 ```bash
-go build ./...
-go test ./...
-```
-
-```bash
-go build ./...
-go test ./...
+devenv run app:typecheck
+devenv run app:test
 ```
 
 Leaving the directory deactivates it automatically.
 
+## Running quality checks locally
+
+devenv tasks wrap the same tools CI uses. Run them with `devenv run`:
+
+```bash
+devenv run app:format           # gofumpt + goimports (auto-fix)
+devenv run app:format:check     # gofumpt + goimports (check)
+devenv run app:lint             # golangci-lint --fix
+devenv run app:lint:check       # golangci-lint
+devenv run app:strlint          # ast-grep scan
+devenv run app:typecheck        # go vet + go build
+devenv run app:test             # go test -race
+```
+
 ## Git Hooks
 
-devenv automatically installs pre-commit hooks when the environment is activated.
-These hooks run on every `git commit` before the commit is recorded:
+devenv automatically installs hooks when the environment is activated:
 
-| Hook | Behaviour |
-|---|---|
-| `ripsecrets` | Scans for accidentally committed secrets; aborts commit if found |
-| `no-commit-to-branch` | Blocks direct commits to `main`; use a branch and open a PR |
+| Hook | Stage | Behaviour |
+|---|---|---|
+| `ripsecrets` | pre-commit | Scans for accidentally committed secrets |
+| `no-commit-to-branch` | pre-commit | Blocks direct commits to `master` and `main` |
+| `app-format` | pre-commit | Checks formatting (gofumpt + goimports); auto-fixes and re-stages, blocks commit |
+| `app-lint` | pre-commit | Checks linting (golangci-lint); auto-fixes and re-stages, blocks commit |
+| `app-strlint` | pre-commit | Structural lint (ast-grep); check-only, blocks commit |
+| `app-typecheck` | pre-push | Runs `go vet` + `go build` |
+| `app-test` | pre-push | Runs `go test -race` |
 
 ## CI/CD
 

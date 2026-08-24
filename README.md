@@ -22,7 +22,7 @@ to the others:
 | Language | Go 1.26 |
 | HTTP | standard library `net/http` (API template) |
 | Dev environment | devenv (Nix-based, reproducible) |
-| Git hooks | `ripsecrets` + `no-commit-to-branch` |
+| Git hooks | `ripsecrets` + `no-commit-to-branch` + format/lint/strlint (pre-commit) + typecheck/test (pre-push) |
 | Formatting | gofumpt + goimports |
 | Linting | golangci-lint (org-wide config) |
 | Structural linting | ast-grep (org-wide rules via `quality-gate`) |
