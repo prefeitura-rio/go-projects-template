@@ -57,24 +57,24 @@ The Go toolchain is declared in `devenv.nix`; no manual Go installation is neede
 Verify the initialized project with:
 
 ```bash
-devenv run app:typecheck
-devenv run app:test
+devenv tasks run app:typecheck
+devenv tasks run app:test
 ```
 
 Leaving the directory deactivates it automatically.
 
 ## Running quality checks locally
 
-devenv tasks wrap the same tools CI uses. Run them with `devenv run`:
+devenv tasks wrap the same tools CI uses. Run them with `devenv tasks run`:
 
 ```bash
-devenv run app:format           # gofumpt + goimports (auto-fix)
-devenv run app:format:check     # gofumpt + goimports (check)
-devenv run app:lint             # golangci-lint --fix
-devenv run app:lint:check       # golangci-lint
-devenv run app:strlint          # ast-grep scan
-devenv run app:typecheck        # go vet + go build
-devenv run app:test             # go test -race
+devenv tasks run app:format           # gofumpt + goimports (auto-fix)
+devenv tasks run app:format:check     # gofumpt + goimports (check)
+devenv tasks run app:lint             # golangci-lint --fix
+devenv tasks run app:lint:check       # golangci-lint
+devenv tasks run app:strlint           # ast-grep scan
+devenv tasks run app:typecheck         # go vet + go build
+devenv tasks run app:test              # go test -race
 ```
 
 ## Git Hooks
