@@ -1,7 +1,4 @@
-// Package app provides the application factory: it wires the HTTP handlers
-// and owns the server lifecycle. Application construction is separated from
-// process startup so tests can exercise the full application without binding
-// a real TCP port.
+// Package app provides the application factory and server lifecycle.
 package app
 
 import (
@@ -20,17 +17,14 @@ type App struct {
 	server *http.Server
 }
 
-// New wires the mux and registers all handlers.
 func New(port string) *App {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", handler.Health())
 
 	return &App{
 		server: &http.Server{
-			Addr:    fmt.Sprintf(":%s", port),
-			Handler: mux,
-			// Timeouts protect against slow-loris style attacks and hung
-			// connections; ReadHeaderTimeout is mandatory (gosec G112).
+			Addr:              fmt.Sprintf(":%s", port),
+			Handler:           mux,
 			ReadHeaderTimeout: 10 * time.Second,
 			ReadTimeout:       30 * time.Second,
 			WriteTimeout:      30 * time.Second,
@@ -38,14 +32,12 @@ func New(port string) *App {
 	}
 }
 
-// Handler exposes the application's HTTP handler, allowing tests to inject
-// the handler without starting a real TCP server.
+// Handler exposes the application's HTTP handler.
 func (a *App) Handler() http.Handler {
 	return a.server.Handler
 }
 
-// Run starts the HTTP server and blocks until ctx is cancelled or the server
-// fails. On cancellation it performs a graceful shutdown.
+// Run starts the HTTP server and shuts it down when ctx is cancelled.
 func (a *App) Run(ctx context.Context) error {
 	errCh := make(chan error, 1)
 	go func() {

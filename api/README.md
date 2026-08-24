@@ -39,38 +39,27 @@ A minimal, production-ready template for Go HTTP API services.
 
 ## Getting Started
 
-The Go toolchain is declared in `devenv.nix`. You do not install it manually.
-The bootstrap script installs the prerequisites and sets up automatic environment
-activation in a single step.
-
-### Step 1 — Bootstrap (one time, per machine)
+Copy this directory into a new, empty repository and run the bootstrap script:
 
 ```bash
+cp -r go-projects-template/api/. my-new-api/
+cd my-new-api
 bash scripts/bootstrap.sh
 ```
 
-The script:
+The script prompts for the project name and Go module path, updates the module
+and imports, installs the prerequisites, adds the devenv shell hook, and trusts
+the project automatically. After it finishes, open a **new terminal**. The
+environment activates automatically when you navigate to the project.
 
-| What | Details |
-|---|---|
-| Installs Nix | Package manager that devenv is built on |
-| Installs devenv | Reads `devenv.nix`; provides the Go toolchain |
-| Adds devenv shell hook | One line in your shell RC file (`~/.bashrc`, `~/.zshrc`, etc.) that enables auto-activation on `cd` |
+The Go toolchain is declared in `devenv.nix`; no manual Go installation is needed.
 
-After the script finishes, open a **new terminal** so the shell hook takes effect.
-
-### Step 2 — Trust the project (one time, per clone)
+Verify the initialized project with:
 
 ```bash
-devenv allow
+go build ./...
+go test ./...
 ```
-
-This tells devenv it may activate automatically when you enter this directory.
-
-### Step 3 — Work normally
-
-From this point on, entering the project directory in any terminal automatically
-activates the full environment — Go, git hooks — with no extra commands.
 
 ```bash
 go build ./...

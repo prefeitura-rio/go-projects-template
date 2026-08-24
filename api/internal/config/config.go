@@ -1,6 +1,4 @@
-// Package config loads the application configuration from environment
-// variables. Secrets must never be hard-coded here; read them from the
-// environment instead (see the .env ignore rules in .gitignore).
+// Package config loads application configuration from environment variables.
 package config
 
 import (
@@ -10,14 +8,11 @@ import (
 
 // Config holds the application configuration.
 type Config struct {
-	// Port is the TCP port the HTTP server listens on.
-	Port string
-	// LogLevel is the structured logger level: debug, info, warn or error.
+	Port     string
 	LogLevel string
 }
 
-// Load reads the configuration from environment variables, applying defaults
-// when a variable is not set.
+// Load reads configuration from environment variables.
 func Load() (*Config, error) {
 	cfg := &Config{
 		Port:     envOr("PORT", "8080"),
@@ -33,8 +28,6 @@ func Load() (*Config, error) {
 	return cfg, nil
 }
 
-// envOr returns the value of the environment variable name, or def when the
-// variable is unset or empty.
 func envOr(name, def string) string {
 	if v := os.Getenv(name); v != "" {
 		return v

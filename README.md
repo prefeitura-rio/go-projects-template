@@ -44,26 +44,27 @@ The four checks run in parallel. `test` runs only after all four pass. This
 keeps feedback fast: a formatting error does not block linting, and tests only
 run on code that has already passed static analysis.
 
+The `api/` template additionally ships `.github/workflows/sast.yaml` — security
+scanning (opengrep, grype/SBOM, checkov, SonarQube) via the org reusable
+workflow `prefeitura-rio/actions/.github/workflows/sast.yml`. See
+[api/README.md](./api/README.md) for the required secrets and variables.
+
 ## How to use a template
 
-1. Copy the template subdirectory into a new, empty repository:
-   ```bash
-   cp -r go-projects-template/api/. my-new-api/
-   cd my-new-api
-   ```
-2. Update the module name in `go.mod` and `name` in `devenv.nix`.
-3. Follow the template-specific README for the remaining rename steps.
-4. Bootstrap the dev environment:
-   ```bash
-   bash scripts/bootstrap.sh
-   # Open a new terminal, then:
-   devenv allow
-   ```
-5. Verify everything works:
-   ```bash
-   go build ./...
-   go test ./...
-   ```
+Copy the desired template subdirectory into a new, empty repository and run its
+bootstrap script. For example:
+
+```bash
+cp -r go-projects-template/api/. my-new-api/
+cd my-new-api
+bash scripts/bootstrap.sh
+```
+
+The script prompts for the values required by the selected template, performs
+the renames and substitutions, installs the development environment, and trusts
+the project automatically. Open a **new terminal** after the script finishes.
+
+Follow the template-specific README for the prompts and verification commands.
 
 ## Template-specific docs
 
