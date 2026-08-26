@@ -49,6 +49,18 @@ scanning (opengrep, grype/SBOM, checkov, SonarQube) via the org reusable
 workflow `prefeitura-rio/actions/.github/workflows/sast.yml`. See
 [api/README.md](./api/README.md) for the required secrets and variables.
 
+## Combining templates in one repository
+
+If this template is placed under a subdirectory of a larger repository, its
+nested `.github/workflows/` directory is not executed by GitHub. Define one
+workflow at the repository root and call
+`prefeitura-rio/actions/.github/workflows/quality-gate.yml@master` with an
+explicit project name and `working-directory` for each project. Project names
+are arbitrary; `api`, `library`, and `cli` are conventions, not an allowlist.
+Because one Git repository has one effective hook set, combined repositories
+must also define one root devenv configuration with project-qualified tasks;
+nested template devenv shells must not compete to install hooks.
+
 ## How to use a template
 
 Copy the desired template subdirectory into a new, empty repository and run its

@@ -103,7 +103,7 @@
       enable = true;
       entry = "${pkgs.writeShellScript "app-strlint" ''
         echo "[pre-commit] app:strlint:check — running structural lint..."
-        if ! devenv tasks run app:strlint:check > /dev/null 2>&1; then
+        if ! devenv tasks run app:strlint:check; then
           echo "[pre-commit] app:strlint:check — failed. Fix violations above."
           exit 1
         fi
