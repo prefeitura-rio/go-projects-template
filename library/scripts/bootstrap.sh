@@ -49,6 +49,7 @@ initialize_project() {
 
   read -r -p "Package name: " package_name
   [[ "$package_name" =~ ^[a-z][a-z0-9_]*$ ]] || die "package name must be a valid lowercase Go identifier"
+  [[ "$package_name" != *_* ]] || die "package name cannot contain underscores: Go style (staticcheck ST1003) rejects them in package names"
   case "$package_name" in
     break|default|func|interface|select|case|defer|go|map|struct|chan|else|goto|package|switch|const|fallthrough|if|range|type|continue|for|import|return|var)
       die "package name cannot be a Go keyword"
@@ -61,9 +62,6 @@ initialize_project() {
       ;;
     main)
       die "package name cannot be 'main': a main package is a program and cannot be imported as a library"
-      ;;
-    *_test)
-      die "package name cannot end in '_test': Go would treat $package_name.go as a test file"
       ;;
   esac
   [[ "$package_name" != "mylibrary" ]] || die "package name cannot be the template placeholder"
