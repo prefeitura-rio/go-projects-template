@@ -78,6 +78,7 @@ initialize_project() {
 
   mv mylibrary.go "$package_name.go"
   mv mylibrary_test.go "${package_name}_test.go"
+  sed -i "s|^\([[:space:]]*\)mylibrary \"|\1$package_name \"|" "${package_name}_test.go"
   sed -i "s|github.com/prefeitura-rio/go-library-template|$module_path|g" "${package_name}_test.go"
   sed -i "s|package mylibrary|package $package_name|g" "$package_name.go"
   sed -i "s|Package mylibrary|Package $package_name|g" "$package_name.go"
