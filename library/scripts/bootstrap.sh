@@ -59,6 +59,9 @@ initialize_project() {
     init)
       die "package name cannot be 'init': Go does not allow importing a package as init"
       ;;
+    main)
+      die "package name cannot be 'main': a main package is a program and cannot be imported as a library"
+      ;;
     *_test)
       die "package name cannot end in '_test': Go would treat $package_name.go as a test file"
       ;;
