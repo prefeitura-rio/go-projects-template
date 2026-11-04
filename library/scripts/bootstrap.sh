@@ -53,6 +53,15 @@ initialize_project() {
     break|default|func|interface|select|case|defer|go|map|struct|chan|else|goto|package|switch|const|fallthrough|if|range|type|continue|for|import|return|var)
       die "package name cannot be a Go keyword"
       ;;
+    testing|t)
+      die "package name cannot be '$package_name': it collides with an identifier in the generated test file"
+      ;;
+    init)
+      die "package name cannot be 'init': Go does not allow importing a package as init"
+      ;;
+    *_test)
+      die "package name cannot end in '_test': Go would treat $package_name.go as a test file"
+      ;;
   esac
   [[ "$package_name" != "mylibrary" ]] || die "package name cannot be the template placeholder"
   [[ ! -e "$package_name.go" && ! -e "${package_name}_test.go" ]] || die "target package files already exist"
