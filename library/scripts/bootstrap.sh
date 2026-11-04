@@ -53,7 +53,7 @@ initialize_project() {
     break|default|func|interface|select|case|defer|go|map|struct|chan|else|goto|package|switch|const|fallthrough|if|range|type|continue|for|import|return|var)
       die "package name cannot be a Go keyword"
       ;;
-    testing|t)
+    testing|t|got)
       die "package name cannot be '$package_name': it collides with an identifier in the generated test file"
       ;;
     init)
