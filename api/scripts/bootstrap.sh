@@ -83,10 +83,10 @@ step "Checking for Nix..."
 if command -v nix &>/dev/null; then
   ok "Nix is already installed: $(nix --version)"
 else
-  step "Installing Nix + devenv via the official devenv installer..."
+  step "Installing Nix via the installer recommended by devenv..."
   note "This will install Nix system-wide and may ask for your password."
   note "Source: https://devenv.sh/getting-started/"
-  curl -L https://devenv.sh/install.sh | bash
+  curl -sSfL https://artifacts.nixos.org/nix-installer | sh -s -- install
 
   if [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
     . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
